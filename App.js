@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useEffect } from "react"; // functions for state and API loading
+import AsyncStorage from "@react-native-async-storage/async-storage"; // don't know
+import { NavigationContainer } from "@react-navigation/native"; // for navigation
+import { createNativeStackNavigator } from "@react-navigation/native-stack"; // for navigation
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"; // for navigation at the bottom of the app
+import { Ionicons } from "@expo/vector-icons"; // to import icons
+
+// Components import
 import HomeScreen from "./containers/HomeScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
@@ -11,6 +13,7 @@ import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
 import SplashScreen from "./containers/SplashScreen";
 
+// For navigation
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +21,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
 
+  // Don't understand
   const setToken = async (token) => {
     if (token) {
       await AsyncStorage.setItem("userToken", token);
@@ -28,6 +32,7 @@ export default function App() {
     setUserToken(token);
   };
 
+  // Don't understand
   useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
@@ -44,14 +49,14 @@ export default function App() {
     bootstrapAsync();
   }, []);
 
-  if (isLoading === true) {
+  if (isLoading === true) { // to use if haven't received token => to be seen
     // We haven't finished checking for the token yet
     return null;
   }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         {userToken === null ? (
           // No token found, user isn't signed in
           <>
@@ -68,7 +73,7 @@ export default function App() {
             {() => (
               <Tab.Navigator
                 screenOptions={{
-                  headerShown: false,
+                  headerShown: false, // hides header ?
                   tabBarActiveTintColor: "tomato",
                   tabBarInactiveTintColor: "gray",
                 }}
