@@ -1,9 +1,10 @@
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Button, Text, View, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, Platform, Dimensions, Image, TextInput, ScrollView} from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, Platform, Dimensions, Image, TextInput, ScrollView} from "react-native";
 import { Entypo } from '@expo/vector-icons'; 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Constants from "expo-constants";
+import axios from "axios";
 
 export default function SignInScreen({ setToken }) {  
   const navigation = useNavigation();
@@ -12,19 +13,40 @@ export default function SignInScreen({ setToken }) {
   const [password, setPassword] = useState("")
   const [vispass, setVisPass] = useState(false)
   const [response, setResponse] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const manageSubmit = async(email, password) => {
+    if(!email) {
+      setResponse("Please provide an email")
+    } else if(!password) {
+      setResponse("Please provide a password")
+    } else {
+      try {
+        setIsLoading(true)
+        const response = await axios.post("https://express-airbnb-api.herokuapp.com/user/log_in",
+        {email: email, password: password})
+        console.log(response.data)
+        setToken(response.data.token)
+        setIsLoading(false)
+      } catch (error) {
+        setResponse("Your email or password is wrong")
+        setIsLoading(false)
+      }
+    }
+  }
 
   return (
     <KeyboardAwareScrollView>
       <SafeAreaView>
         <ScrollView style={Platform.OS === "android" ? styles.android : styles.ios}>
           <View style={styles.imagecontainer}>
-            <Image source={require("../assets/airbnb-logo.png")} style={styles.airbnblogo}></Image>
+            <Image source={require("../assets/Images/airbnb-logo.png")} style={styles.airbnblogo}></Image>
             <Text style={styles.pageTitle}>Sign in</Text>
           </View>
           <View style={styles.formcontainer}>
-            <TextInput placeholder="email" style={styles.smallinput} onChangeText={text => {setEmail(text)}} value={email}/>
+            <TextInput placeholder="email" style={styles.smallinput} onChangeText={text => {setEmail(text)}} value={email} autoCorrect={false} autoCapitalize="none"/>
             <View style={styles.passwordcontainer}>
-              <TextInput placeholder="password" secureTextEntry={!vispass ? true : false} style={styles.smallinput} 
+              <TextInput placeholder="password" secureTextEntry={!vispass ? true : false} style={styles.smallinput} autoCorrect={false} autoCapitalize="none"
               onChangeText={text => {setPassword(text);}} value={password}/>
               { 
                 !vispass ?
@@ -33,13 +55,9 @@ export default function SignInScreen({ setToken }) {
                 <Entypo name="eye-with-line" style={styles.icon} onPress={() => {setVisPass(false)}}></Entypo>
               }
             </View>
+            {response ? <View style={styles.imagecontainer}><Text style={styles.error}>{response}</Text></View> : <View></View>}
             <View style={styles.imagecontainer}>
-              <TouchableOpacity style={styles.signinbutton}
-                onPress={async () => {
-                  const userToken = "secret-token";
-                  setToken(userToken);
-                }}
-              >
+              <TouchableOpacity style={styles.signinbutton} onPress={async () => {manageSubmit(email, password)}}>
                 <Text>Sign in</Text>
               </TouchableOpacity>
             </View>
@@ -54,6 +72,9 @@ export default function SignInScreen({ setToken }) {
           <View style={styles.imagecontainer}>
             <View style={styles.blackbar}></View>
           </View>
+          {isLoading && <View style={styles.loadmodal}>
+            <ActivityIndicator style={styles.loading} size="large"></ActivityIndicator>
+          </View>}
         </ScrollView>
       </SafeAreaView>
     </KeyboardAwareScrollView>
@@ -127,8 +148,27 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     width: 120,
     height: 5
+  },
+  loadmodal: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    borderWidth: 1,
+    borderColor: "red",
+    width: Dimensions.get('window').width,
+    height: Dimensions.get("window").height,
+    paddingVertical: Dimensions.get("window").height / 2,
+    zIndex: 2
+  },
+  loading: {
+    zIndex: 3,
+    position: "relative",
+    height: 40,
+  },
+  error: {
+    color: "#F9575C",
+    fontSize: 12,
+    position: "relative",
+    top: 25
   }
 })
-
-// borderWidth: 1,
-// borderColor: "red"
