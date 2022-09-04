@@ -12,6 +12,8 @@ import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
 import SplashScreen from "./containers/SplashScreen";
+import Room from "./containers/Room";
+import "./assets/Functions/ignoreWarnings"
 
 // For navigation
 const Tab = createBottomTabNavigator();
@@ -21,7 +23,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
 
-  // Don't understand
+  // Function to get or remove token based on if there is a token
   const setToken = async (token) => {
     if (token) {
       await AsyncStorage.setItem("userToken", token);
@@ -32,7 +34,6 @@ export default function App() {
     setUserToken(token);
   };
 
-  // Don't understand
   useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
@@ -69,7 +70,7 @@ export default function App() {
           </>
         ) : (
           // User is signed in ! 🎉
-          <Stack.Screen name="Tab" options={{ headerShown: false }}>
+          <Stack.Screen name="Tab">
             {() => (
               <Tab.Navigator
                 screenOptions={{
@@ -85,18 +86,18 @@ export default function App() {
                     tabBarIcon: ({ color, size }) => (
                       <Ionicons name={"ios-home"} size={size} color={color} />
                     ),
+                    headerShown: false
                   }}
                 >
                   {() => (
-                    <Stack.Navigator>
+                    <Stack.Navigator screenOptions={{headerShown: false}}>
                       <Stack.Screen
                         name="Home"
                         options={{
                           title: "My App",
                           headerStyle: { backgroundColor: "red" },
                           headerTitleStyle: { color: "white" },
-                        }}
-                      >
+                        }}>
                         {() => <HomeScreen />}
                       </Stack.Screen>
 
@@ -108,6 +109,7 @@ export default function App() {
                       >
                         {() => <ProfileScreen />}
                       </Stack.Screen>
+                      <Stack.Screen name="room" component={Room} options={{headerShown: false}}></Stack.Screen>
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
