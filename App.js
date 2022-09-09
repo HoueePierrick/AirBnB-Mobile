@@ -13,6 +13,7 @@ import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
 import SplashScreen from "./containers/SplashScreen";
 import Room from "./containers/Room";
+import AroundMe from "./containers/AroundMe";
 import "./assets/Functions/ignoreWarnings"
 
 // For navigation
@@ -79,6 +80,7 @@ export default function App() {
                   tabBarInactiveTintColor: "gray",
                 }}
               >
+                
                 <Tab.Screen
                   name="TabHome"
                   options={{
@@ -89,8 +91,10 @@ export default function App() {
                     headerShown: false
                   }}
                 >
+
                   {() => (
                     <Stack.Navigator screenOptions={{headerShown: false}}>
+
                       <Stack.Screen
                         name="Home"
                         options={{
@@ -109,10 +113,41 @@ export default function App() {
                       >
                         {() => <ProfileScreen />}
                       </Stack.Screen>
+
                       <Stack.Screen name="room" component={Room} options={{headerShown: false}}></Stack.Screen>
+
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
+
+                <Tab.Screen
+                  name="TabAroundMe"
+                  options={{
+                    tabBarLabel: "Around me",
+                    tabBarIcon: ({ color, size }) => (
+                      <Ionicons
+                        name={"location-outline"}
+                        size={size}
+                        color={color}
+                      />
+                    ),
+                  }}
+                >
+                  {() => (
+                    <Stack.Navigator>
+                      <Stack.Screen
+                        name="AroundMe"
+                        options={{
+                          title: "AroundMe",
+                          headerShown: false
+                        }}
+                      >
+                        {() => <AroundMe />}
+                      </Stack.Screen>
+                    </Stack.Navigator>
+                  )}
+                </Tab.Screen>
+
                 <Tab.Screen
                   name="TabSettings"
                   options={{
@@ -139,6 +174,7 @@ export default function App() {
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
+
               </Tab.Navigator>
             )}
           </Stack.Screen>

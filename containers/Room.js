@@ -1,13 +1,14 @@
 import { useNavigation } from "@react-navigation/core";
-import { Button, Text, View, FlatList, ActivityIndicator, StyleSheet, Dimensions, Image, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
+import { Text, View, ActivityIndicator, StyleSheet, Dimensions, Image, TouchableOpacity, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-const Stringify = require("../assets/Functions/Stringify");
 import Rating from "../assets/Functions/Rating";
 import { AntDesign } from '@expo/vector-icons'; 
 import { FontAwesome } from '@expo/vector-icons'; 
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
+import React from "react";
+import MapView from "react-native-maps";
+import { PROVIDER_GOOGLE } from "react-native-maps";
 
 
 export default function Room ({route}) {
@@ -40,6 +41,7 @@ export default function Room ({route}) {
                 // Reviews => item.reviews
         // AccountPic => item.user.account.photo.url
     // Description => item.description
+    // Map : item.location
 
     const navigation = useNavigation();
 
@@ -54,56 +56,76 @@ export default function Room ({route}) {
                     <Image source={require("../assets/Images/airbnb-logo.png")} style={styles.airbnblogo}></Image>
                 </View>
             </View>
-            <View style={styles.flatlist}>
-                <View style={styles.suboffer_container_one}>
-                    {/* <Image source={{uri: data.photos[0].url}} style={styles.offer_image} resizeMode="cover"></Image> */}
-                    <SwiperFlatList style={styles.swiper}
-                        autoplay
-                        autoplayDelay={2}
-                        autoplayLoop
-                        index={2}
-                        showPagination
-                        data={data.photos}
-                        paginationStyle={styles.pagination}
-                        renderItem={({ item }) => (
-                            <Image source={{uri: item.url}} style={styles.offer_image} resizeMode="cover"></Image>
-                        )}
-                    />
-                    <Text style={styles.textbox}>{data.price} €</Text>
-                </View>
-                <View style={styles.suboffer_container_two}>
-                    <View style={styles.suboffer_subcontainer}>
-                        <Text style={styles.offer_title} ellipsizeMode="tail" numberOfLines={1}>{data.title}</Text>
-                        <Rating num1={data.ratingValue} num2={data.reviews}></Rating>
+            <ScrollView>
+
+                <View style={styles.flatlist}>
+                    <View style={styles.suboffer_container_one}>
+                        {/* <Image source={{uri: data.photos[0].url}} style={styles.offer_image} resizeMode="cover"></Image> */}
+                        <SwiperFlatList style={styles.swiper}
+                            autoplay
+                            autoplayDelay={2}
+                            autoplayLoop
+                            index={2}
+                            showPagination
+                            data={data.photos}
+                            paginationStyle={styles.pagination}
+                            renderItem={({ item }) => (
+                                <Image source={{uri: item.url}} style={styles.offer_image} resizeMode="cover"></Image>
+                            )}
+                        />
+                        <Text style={styles.textbox}>{data.price} €</Text>
                     </View>
-                    <Image style={styles.accountimage} source={{uri: data.user.account.photo.url}} resizeMode="contain"></Image>
+                    <View style={styles.suboffer_container_two}>
+                        <View style={styles.suboffer_subcontainer}>
+                            <Text style={styles.offer_title} ellipsizeMode="tail" numberOfLines={1}>{data.title}</Text>
+                            <Rating num1={data.ratingValue} num2={data.reviews}></Rating>
+                        </View>
+                        <Image style={styles.accountimage} source={{uri: data.user.account.photo.url}} resizeMode="contain"></Image>
+                    </View>
                 </View>
-            </View>
-            {!visible ? 
-            <>
-                <Text style={styles.description} ellipsizeMode="tail" numberOfLines={3}>{data.description}</Text>
-                <TouchableOpacity style={styles.showcontainer} onPress={() => {setVisible(true)}}>
-                    <Text style={styles.showmore}>Show more</Text>
-                    <FontAwesome name="caret-down" size={24} color="#717171" />
-                </TouchableOpacity>
-            </>
-            :
-            <>
-                <Text style={styles.description} ellipsizeMode="tail" numberOfLines={10}>{data.description}</Text>
-                <TouchableOpacity style={styles.showcontainer} onPress={() => {setVisible(false)}}>
-                    <Text style={styles.showmore}>Show less</Text>
-                    <FontAwesome name="caret-up" size={24} color="#717171" />
-                </TouchableOpacity>
-            </>
-            }
-            {/* <FlatList data={data} keyExtractor={"a"}></FlatList> */}
+                {!visible ? 
+                <>
+                    <Text style={styles.description} ellipsizeMode="tail" numberOfLines={3}>{data.description}</Text>
+                    <TouchableOpacity style={styles.showcontainer} onPress={() => {setVisible(true)}}>
+                        <Text style={styles.showmore}>Show more</Text>
+                        <FontAwesome name="caret-down" size={24} color="#717171" />
+                    </TouchableOpacity>
+                </>
+                :
+                <>
+                    <Text style={styles.description} ellipsizeMode="tail" numberOfLines={10}>{data.description}</Text>
+                    <TouchableOpacity style={styles.showcontainer} onPress={() => {setVisible(false)}}>
+                        <Text style={styles.showmore}>Show less</Text>
+                        <FontAwesome name="caret-up" size={24} color="#717171" />
+                    </TouchableOpacity>
+                </>
+                }
+              <MapView style={styles.mapview} 
+              provider={PROVIDER_GOOGLE}
+              initialRegion={{
+                latitude: data.location[1],
+                longitude: data.location[0],
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1
+              }}>
+                <MapView.Marker coordinate={{
+                  latitude: data.location[1],
+                  longitude: data.location[0]
+                }}></MapView.Marker>
+              </MapView>
+            </ScrollView>
         </View>
     )
     :
     (
         <View>
-            <View style={styles.imagecontainer}>
-              <Image source={require("../assets/Images/airbnb-logo.png")} style={styles.airbnblogo}></Image>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => {navigation.navigate("Home")}} style={styles.arrowcontainer}>
+                    <AntDesign name="arrowleft" size={30} color="#727272" />
+                </TouchableOpacity>
+                <View style={styles.imagecontainer}>
+                    <Image source={require("../assets/Images/airbnb-logo.png")} style={styles.airbnblogo}></Image>
+                </View>
             </View>
             <View style={styles.lottiecontainer}>
                 <ActivityIndicator></ActivityIndicator>
@@ -199,6 +221,7 @@ const styles = StyleSheet.create({
         borderRadius: 50
       },
       lottiecontainer: {
+        marginTop: 20,
         width: "100%",
         alignItems: "center"
       },
@@ -216,5 +239,12 @@ const styles = StyleSheet.create({
         color: "#717171",
         fontSize: 16,
         marginRight: 10
+      },
+      mapview: {
+        height: 200,
+        width: Dimensions.get("window").width - 20*2,
+        marginLeft: 20,
+        marginTop: 20,
+        marginBottom: 100
       }
 })
