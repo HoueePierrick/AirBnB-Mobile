@@ -10,7 +10,7 @@ import HomeScreen from "./containers/HomeScreen";
 import ProfileScreen from "./containers/ProfileScreen";
 import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
-import SettingsScreen from "./containers/SettingsScreen";
+import Profile from "./containers/Profile";
 import SplashScreen from "./containers/SplashScreen";
 import Room from "./containers/Room";
 import AroundMe from "./containers/AroundMe";
@@ -22,16 +22,15 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [userToken, setUserToken] = useState(null);
+  const [userToken, setUserToken] = useState({});
 
   // Function to get or remove token based on if there is a token
   const setToken = async (token) => {
     if (token) {
-      await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userToken", JSON.stringify(token));
     } else {
       await AsyncStorage.removeItem("userToken");
     }
-
     setUserToken(token);
   };
 
@@ -39,11 +38,11 @@ export default function App() {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
       // We should also handle error for production apps
-      const userToken = await AsyncStorage.getItem("userToken");
-
+      const gotToken = await AsyncStorage.getItem("userToken");
+      const finalToken = JSON.parse(gotToken) 
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
-      setUserToken(userToken);
+      setUserToken(finalToken);
 
       setIsLoading(false);
     };
@@ -149,12 +148,12 @@ export default function App() {
                 </Tab.Screen>
 
                 <Tab.Screen
-                  name="TabSettings"
+                  name="TabProfile"
                   options={{
-                    tabBarLabel: "Settings",
+                    tabBarLabel: "Profile",
                     tabBarIcon: ({ color, size }) => (
                       <Ionicons
-                        name={"ios-options"}
+                        name={"person-outline"}
                         size={size}
                         color={color}
                       />
@@ -164,12 +163,13 @@ export default function App() {
                   {() => (
                     <Stack.Navigator>
                       <Stack.Screen
-                        name="Settings"
+                        name="Profile"
                         options={{
-                          title: "Settings",
+                          title: "Profile",
+                          headerShown: false
                         }}
                       >
-                        {() => <SettingsScreen setToken={setToken} />}
+                        {() => <Profile setToken={setToken} userToken={userToken}/>}
                       </Stack.Screen>
                     </Stack.Navigator>
                   )}

@@ -39,7 +39,11 @@ export default function SignUpScreen({ setToken }) {
         setIsLoading(true)
         const response = await axios.post("https://express-airbnb-api.herokuapp.com/user/sign_up",
         {email: email, username: userName, description: description, password: password})
-        setToken(response.data.token)
+        const tokencontent = {
+          token: response.data.token,
+          id: response.data.id
+        }
+        setToken(tokencontent)
         setIsLoading(false)
       } catch (error) {
         setResponse(error.response.data.error)

@@ -25,8 +25,12 @@ export default function SignInScreen({ setToken }) {
         setIsLoading(true)
         const response = await axios.post("https://express-airbnb-api.herokuapp.com/user/log_in",
         {email: email, password: password})
+        const tokencontent = {
+          token: response.data.token,
+          id: response.data.id
+        }
         console.log(response.data)
-        setToken(response.data.token)
+        setToken(tokencontent)
         setIsLoading(false)
       } catch (error) {
         setResponse("Your email or password is wrong")
